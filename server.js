@@ -1,16 +1,22 @@
-// server.js
-const express = require("express");
-const { createProxyMiddleware } = require("http-proxy-middleware");
-const path = require("path");
-const app = express();
+import express from "express";
+import { createProxyMiddleware } from "http-proxy-middleware";
+import path from "path";
+import { fileURLToPath } from "url";
 
-// 1. Cấu hình Proxy cho API Rikkei (giống hệt vite.config.ts của bạn)
+// Tạo __dirname (vì trong ES Modules biến này không có sẵn)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// 1. Cấu hình Proxy cho API Rikkei
 app.use(
   "/api-rikkei",
   createProxyMiddleware({
     target: "https://apiportal.rikkei.edu.vn",
     changeOrigin: true,
-    pathRewrite: { "^/api-rikkei": "" }, // Xóa /api-rikkei đi
+    pathRewrite: { "^/api-rikkei": "" },
     onProxyReq: (proxyReq) => {
       // Fake headers để đánh lừa server Rikkei
       proxyReq.setHeader("Origin", "https://portal.rikkei.edu.vn");
@@ -19,26 +25,15 @@ app.use(
   })
 );
 
-// 2. Cấu hình Proxy cho API Backend của bạn (NodeJS/Java)
-// Nếu bạn không dùng cái này thì có thể bỏ qua
-app.use(
-  "/api",
-  createProxyMiddleware({
-    target: process.env.BACKEND_URL || "http://172.26.112.1:3001",
-    changeOrigin: true,
-    pathRewrite: { "^/api": "" },
-  })
-);
-
-// 3. Serve file tĩnh (Frontend sau khi build)
+// 2. Serve file tĩnh từ thư mục dist (sau khi build xong)
 app.use(express.static(path.join(__dirname, "dist")));
 
-// 4. Xử lý React Router (F5 không bị lỗi 404)
+// 3. Xử lý React Router (để khi F5 ở trang con không bị lỗi 404)
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
-const PORT = process.env.PORT || 3000;
+// Khởi chạy server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
