@@ -24,15 +24,18 @@ import {
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
-// --- CẤU HÌNH API VÀ PROXY ---
+// --- CẤU HÌNH API VÀ TOKEN ---
 const TEST_ID: number = 177;
-const BASE_API_PATH: string = `/api-rikkei/tests/${TEST_ID}`;
 
-// **************************** TOKEN XÁC THỰC ****************************
-const AUTH_TOKEN: string =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpa2tlaXJkQGdtYWlsLmNvbSIsIm5hbWUiOiJSJkQiLCJpZCI6ODMsInJvbGUiOlt7ImlkIjoxLCJuYW1lIjoiQURNSU4ifSx7ImlkIjoyLCJuYW1lIjoiTUFOQUdFUiJ9LHsiaWQiOjMsIm5hbWUiOiJURUFDSEVSIn0seyJpZCI6NCwibmFtZSI6IlRFQUNIRVJfQVNTSVNUQU5UIn0seyJpZCI6NSwibmFtZSI6IkdVRVNUIn1dLCJ0eXBlIjoidXNlciIsImlhdCI6MTc2Nzc3ODA2MSwiZXhwIjoxNzY3ODY0NDYxfQ.UA8Xb1plz9pKpkEEpNM52TcTPVCpaLW5T322K9SOpSw";
-// **************************************************************************
+// Lấy URL từ biến môi trường. Nếu không có thì mặc định là chuỗi rỗng
+const API_URL = "";
 
+// Ghép chuỗi để tạo thành đường dẫn đầy đủ
+// Kết quả sẽ là: http://localhost:8080/api-rikkei/tests/177
+const BASE_API_PATH: string = `${API_URL}/api-rikkei/tests/${TEST_ID}`;
+
+// Lấy Token từ file .env
+const AUTH_TOKEN: string = import.meta.env.VITE_AUTH_TOKEN || "";
 // --- INTERFACE ---
 interface OptionTest {
   id: number;
