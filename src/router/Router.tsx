@@ -2,12 +2,13 @@ import { createBrowserRouter } from "react-router-dom";
 import StudentResultLookup from "../components/StudentResultLookup";
 import UsersDataFetcher from "../components/UsersDataFetcher";
 import TestDetailsFetcher from "../components/TestDetailsFetcher";
+import Quizz from "../components/Quizz";
 // import Bracket from "../components/CompetitionTable/bracket/BracketMain";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <StudentResultLookup></StudentResultLookup>,
+    element: <TestDetailsFetcher></TestDetailsFetcher>,
   },
   {
     path: "teacherData",
@@ -15,7 +16,11 @@ const router = createBrowserRouter([
   },
   {
     path: "studentResultLookup",
-    element: <TestDetailsFetcher></TestDetailsFetcher>,
+    element: <StudentResultLookup></StudentResultLookup>,
+  },
+  {
+    path: "quizz",
+    element: <Quizz></Quizz>,
   },
 ]);
 

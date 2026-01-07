@@ -1,4 +1,5 @@
 import { useState, useEffect, type JSX } from "react";
+import { useNavigate } from "react-router-dom"; // <--- 1. IMPORT ĐIỀU HƯỚNG
 import {
   Button,
   Card,
@@ -9,7 +10,7 @@ import {
   Descriptions,
   Tag,
   Divider,
-  Collapse, // Dùng để ẩn/hiện danh sách câu hỏi
+  Collapse,
 } from "antd";
 import {
   ReadOutlined,
@@ -17,6 +18,7 @@ import {
   QuestionCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  PlayCircleOutlined, // <--- 2. IMPORT ICON MỚI
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -28,11 +30,10 @@ const BASE_API_PATH: string = `/api-rikkei/tests/${TEST_ID}`;
 
 // **************************** TOKEN XÁC THỰC ****************************
 const AUTH_TOKEN: string =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpa2tlaXJkQGdtYWlsLmNvbSIsIm5hbWUiOiJSJkQiLCJpZCI6ODMsInJvbGUiOlt7ImlkIjoxLCJuYW1lIjoiQURNSU4ifSx7ImlkIjoyLCJuYW1lIjoiTUFOQUdFUiJ9LHsiaWQiOjMsIm5hbWUiOiJURUFDSEVSIn0seyJpZCI6NCwibmFtZSI6IlRFQUNIRVJfQVNTSVNUQU5UIn0seyJpZCI6NSwibmFtZSI6IkdVRVNUIn1dLCJ0eXBlIjoidXNlciIsImlhdCI6MTc2NzcxMTUwOSwiZXhwIjoxNzY3Nzk3OTA5fQ.SLtOovKSuTGOcv3x0De9RbfuEmdwh_ONa-rZD1cR1o0";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpa2tlaXJkQGdtYWlsLmNvbSIsIm5hbWUiOiJSJkQiLCJpZCI6ODMsInJvbGUiOlt7ImlkIjoxLCJuYW1lIjoiQURNSU4ifSx7ImlkIjoyLCJuYW1lIjoiTUFOQUdFUiJ9LHsiaWQiOjMsIm5hbWUiOiJURUFDSEVSIn0seyJpZCI6NCwibmFtZSI6IlRFQUNIRVJfQVNTSVNUQU5UIn0seyJpZCI6NSwibmFtZSI6IkdVRVNUIn1dLCJ0eXBlIjoidXNlciIsImlhdCI6MTc2Nzc3ODA2MSwiZXhwIjoxNzY3ODY0NDYxfQ.UA8Xb1plz9pKpkEEpNM52TcTPVCpaLW5T322K9SOpSw";
 // **************************************************************************
 
-// --- INTERFACE (KHAI BÁO KIỂU DỮ LIỆU MỚI) ---
-
+// --- INTERFACE ---
 interface OptionTest {
   id: number;
   content: string;
@@ -43,7 +44,7 @@ interface OptionTest {
 interface QuestionTest {
   id: number;
   content: string;
-  type: string; // Vd: "MỘT LỰA CHỌN"
+  type: string;
   status: boolean;
   point: number;
   difficulty: number;
@@ -53,16 +54,14 @@ interface QuestionTest {
 interface TestDetails {
   id: number;
   testName: string;
-  status: boolean; // Đã đổi từ string sang boolean
+  status: boolean;
   time: number;
   type: string;
   created_at: string;
-  questionTests: QuestionTest[]; // Dữ liệu câu hỏi chi tiết
-  // Thêm các trường khác nếu có
+  questionTests: QuestionTest[];
   [key: string]: unknown;
 }
 
-// Interface cho phản hồi API (Có trường 'data' bao bọc)
 interface ApiResponse {
   data: TestDetails;
   message?: string;
@@ -74,6 +73,9 @@ export default function TestDetailsFetcher(): JSX.Element {
   const [apiResponse, setApiResponse] = useState<TestDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 3. KHỞI TẠO HOOK ĐIỀU HƯỚNG
+  const navigate = useNavigate();
 
   const fetchTestDetails = async (): Promise<void> => {
     setLoading(true);
@@ -121,7 +123,13 @@ export default function TestDetailsFetcher(): JSX.Element {
     fetchTestDetails();
   }, []);
 
-  // --- RENDERING OPTIONS (HIỂN THỊ ĐÁP ÁN) ---
+  // --- HÀM ĐIỀU HƯỚNG SANG TRANG QUIZZ ---
+  const handleGoToQuiz = () => {
+    // Giả sử đường dẫn tới component Quizz là "/quizz" hoặc "/lam-bai"
+    // Bạn cần đảm bảo đã định nghĩa route này trong App.tsx
+    navigate("/quizz");
+  };
+
   const renderOptions = (options: OptionTest[]): JSX.Element => (
     <Space direction="vertical" style={{ width: "100%" }}>
       {options.map((option) => (
@@ -156,14 +164,24 @@ export default function TestDetailsFetcher(): JSX.Element {
         </Title>
       }
       extra={
-        <Button
-          type="primary"
-          onClick={fetchTestDetails}
-          loading={loading}
-          icon={<ReloadOutlined />}
-        >
-          Tải lại
-        </Button>
+        // 4. THÊM NÚT VÀO THI VÀO ĐÂY
+        <Space>
+          <Button
+            type="primary"
+            icon={<PlayCircleOutlined />}
+            onClick={handleGoToQuiz}
+            style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }} // Màu xanh lá cho nút bắt đầu
+          >
+            Vào làm bài
+          </Button>
+          <Button
+            onClick={fetchTestDetails}
+            loading={loading}
+            icon={<ReloadOutlined />}
+          >
+            Tải lại
+          </Button>
+        </Space>
       }
       style={{ maxWidth: 1000, margin: "20px auto" }}
     >
@@ -187,7 +205,6 @@ export default function TestDetailsFetcher(): JSX.Element {
           <>
             <Title level={3}>{apiResponse.testName}</Title>
 
-            {/* Thông tin chung */}
             <Descriptions
               bordered
               column={2}
@@ -219,7 +236,6 @@ export default function TestDetailsFetcher(): JSX.Element {
               {apiResponse.questionTests.length} câu)
             </Title>
 
-            {/* Danh sách Câu hỏi (Sử dụng Collapse) */}
             <Collapse accordion>
               {apiResponse.questionTests.map((question, index) => (
                 <Panel
